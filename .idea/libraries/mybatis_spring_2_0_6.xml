@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="mybatis-spring-2.0.6">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/out/artifacts/TravelMap_war_exploded/WEB-INF/lib/mybatis-spring-2.0.6.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
