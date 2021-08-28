@@ -12,33 +12,33 @@ open class AbstractDAO {
 
     @Autowired
     private lateinit var sqlSession: SqlSessionTemplate
-    protected fun printQueryId(queryId: String) {
+    private fun printQueryId(queryId: String) {
         if (log.isDebugEnabled) {
             log.debug("\t QueryId  \t:  $queryId")
         }
     }
 
-    fun insert(queryId: String, params: Any?): Any {
+    fun insert(queryId: String, params: Any?): Int {
         printQueryId(queryId)
         return sqlSession.insert(queryId, params)
     }
 
-    fun update(queryId: String, params: Any?): Any {
+    fun update(queryId: String, params: Any?): Int {
         printQueryId(queryId)
         return sqlSession.update(queryId, params)
     }
 
-    fun delete(queryId: String, params: Any?): Any {
+    fun delete(queryId: String, params: Any?): Int {
         printQueryId(queryId)
         return sqlSession.delete(queryId, params)
     }
 
-    fun selectOne(queryId: String): Any {
+    fun selectOne(queryId: String): Any? {
         printQueryId(queryId)
         return sqlSession.selectOne(queryId)
     }
 
-    fun selectOne(queryId: String, params: Any?): Any {
+    fun selectOne(queryId: String, params: Any?): Any? {
         printQueryId(queryId)
         return sqlSession.selectOne(queryId, params)
     }

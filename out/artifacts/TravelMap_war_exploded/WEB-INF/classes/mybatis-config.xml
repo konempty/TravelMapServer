@@ -2,4 +2,8 @@
 <!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
 <configuration>
 
+    <typeAliases>
+        <typeAlias type="kim.hanbin.travelmap.vo.UserVO" alias="UserVO"/>
+        <typeAlias type="kim.hanbin.travelmap.vo.TrackingVO" alias="TrackingVO"/>
+    </typeAliases>
 </configuration>
