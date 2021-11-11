@@ -13,6 +13,9 @@ interface MainService {
     fun processLogin(request: HttpServletRequest, token: String): String
 
     @Throws(Exception::class)
+    fun loginCheck(request: HttpServletRequest): String
+
+    @Throws(Exception::class)
     fun processLogout(request: HttpServletRequest): String
 
     @Throws(Exception::class)
@@ -35,5 +38,24 @@ interface MainService {
 
     @Throws(Exception::class)
     fun processRouting(model: Model, id: Int): String
+
+    @Throws(Exception::class)
+    fun getUserId(nickname: String): Int
+
+    @Throws(Exception::class)
+    fun addFriendRequest(request: HttpServletRequest, id: Int): String
+
+    @Throws(Exception::class)
+    fun deleteFriend(request: HttpServletRequest, id: Int): String
+
+    @Throws(Exception::class)
+    fun getFriendRequestList(request: HttpServletRequest): String
+
+    @Throws(Exception::class)
+    fun getFriendRequestedList(request: HttpServletRequest): String
+
+    @Throws(Exception::class)
+    fun getFriendList(request: HttpServletRequest): String
+
 
 }

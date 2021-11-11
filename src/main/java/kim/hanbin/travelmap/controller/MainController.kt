@@ -1,14 +1,13 @@
 package kim.hanbin.travelmap.controller
 
 import kim.hanbin.travelmap.service.MainService
+import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestMethod
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.ResponseBody
+import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartHttpServletRequest
+import org.springframework.web.server.ResponseStatusException
 import org.springframework.web.servlet.ModelAndView
 import javax.annotation.Resource
 import javax.servlet.http.HttpServletRequest
@@ -67,6 +66,12 @@ class MainController {
         return "login"
     }
 
+    @RequestMapping("/loginCheck.do")
+    @ResponseBody
+    fun loginCheck(request: HttpServletRequest): String {
+        return mainService.loginCheck(request)
+    }
+
     @RequestMapping("/logout.do")
     @ResponseBody
     fun logout(request: HttpServletRequest): String {
@@ -97,12 +102,48 @@ class MainController {
         return if (file != null)
             ModelAndView("download", "downloadFile", file)
         else
-            ModelAndView("index")
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Unable to find resource")
     }
 
     @RequestMapping("/deleteFile.do")
     @ResponseBody
     fun deleteFile(request: HttpServletRequest, @RequestParam("trackingNum") id: Int): String {
         return mainService.deleteFile(request, id)
+    }
+
+    @RequestMapping("/getUserId.do", method = [RequestMethod.POST])
+    @ResponseBody
+    fun getUserId(@RequestParam("userNickname") nickname: String): Int {
+        return mainService.getUserId(nickname)
+    }
+
+    @RequestMapping("/addFriendRequest.do", method = [RequestMethod.POST])
+    @ResponseBody
+    fun addFriendRequest(request: HttpServletRequest, @RequestParam("id") id: Int): String {
+        return mainService.addFriendRequest(request,id)
+    }
+
+    @RequestMapping("/deleteFriend.do", method = [RequestMethod.POST])
+    @ResponseBody
+    fun deleteFriend(request: HttpServletRequest, @RequestParam("id") id: Int): String {
+        return mainService.deleteFriend(request,id)
+    }
+
+    @RequestMapping("/getFriendRequestList.do")
+    @ResponseBody
+    fun getFriendRequestList(request: HttpServletRequest): String {
+        return mainService.getFriendRequestList(request)
+    }
+
+    @RequestMapping("/getFriendRequestedList.do")
+    @ResponseBody
+    fun getFriendRequestedList(request: HttpServletRequest): String {
+        return mainService.getFriendRequestedList(request)
+    }
+
+    @RequestMapping("/getFriendList.do")
+    @ResponseBody
+    fun getFriendList(request: HttpServletRequest): String {
+        return mainService.getFriendList(request)
     }
 }

@@ -42,4 +42,36 @@ open class MainDAO : AbstractDAO() {
     fun deleteFile(file: TrackingVO): Int {
         return delete("main.deleteTracking", file)
     }
+
+    fun getUserId(nickname: String): Int? {
+        return selectOne("main.getUserId", nickname) as Int?
+    }
+
+    fun checkFriendRequest(map: Map<String, Int>): Int {
+        return selectOne("main.checkFriendRequest", map) as Int
+    }
+
+    fun addFriendRequest(map: Map<String, Int>) {
+        insert("main.addFriendRequest", map)
+    }
+
+
+    fun deleteFriend(map: MutableMap<String, Int>) {
+        delete("main.deleteFriend", map)
+    }
+
+
+    fun getFriendRequestList(user: UserVO): List<String> {
+        return selectList("main.getFriendRequestList", user) as List<String>
+    }
+
+    fun getFriendRequestedList(user: UserVO): List<String> {
+        return selectList("main.getFriendRequestedList", user) as List<String>
+    }
+
+    fun getFriendList(user: UserVO): List<String> {
+        return selectList("main.getFriendList", user) as List<String>
+
+    }
+
 }

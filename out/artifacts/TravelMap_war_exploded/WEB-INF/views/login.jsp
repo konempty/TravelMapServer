@@ -14,7 +14,10 @@
     <meta charset="UTF-8">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
+
     <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
 
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.8.1/firebase-auth.js"></script>
@@ -24,6 +27,7 @@
 
 <script>
     $(function () {
+        $('#nickNameModal').modal('show');
         const firebaseConfig = {
             apiKey: "AIzaSyBmQPeh5_UQ4ylofvDywhi1_Z0vzv7AVQo",
             authDomain: "gps-tracker-303405.firebaseapp.com",
@@ -36,6 +40,55 @@
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         firebase.auth().useDeviceLanguage();
+
+        $('#nickname').keyup(function () {
+            if ($(this).val().length > $(this).attr('maxlength')) {
+                $(this).val($(this).val().substr(0, $(this).attr('maxlength')));
+            }
+        });
+
+        $("#submit").click(function () {
+            const nickname = $("#nickname").val()
+            $.ajax({
+                url: './checkNickname.do',
+                type: 'post',
+                data: {"nickname": nickname},
+                success: function (data) {
+
+                    if (data == 'available') {
+                        firebase.auth().currentUser.getIdToken(/* forceRefresh */ true).then(function (idToken) {
+
+                            $.ajax({
+                                url: './registerUser.do',
+                                type: 'post',
+                                data: {"token": idToken, "nickname": nickname},
+                                dataType: "json",
+                                success: function (data) {
+
+                                    alert(nickname + '님 환영합니다!');
+                                    $('#myModal').modal('hide');
+                                    redirect();
+
+                                },
+                                error: function (request, error) {
+                                    //alert("code:" + request.status + "\n" + "message:" + request.responseText + "\n" + "error:" + error);
+                                    alert("문제가 발생했습니다. 잠시후 다시 시도해주세요.");
+                                }
+                            })
+                        }).catch(function (error) {
+                            alert("문제가 발생했습니다. 잠시후 다시 시도해주세요.");
+                        });
+                    } else {
+                        alert('중복된 닉네임입니다. 다른 닉네임을 입력해주세요.');
+                    }
+
+                },
+                error: function (request, error) {
+                    //alert("code:" + request.status + "\n" + "message:" + request.responseText + "\n" + "error:" + error);
+                    alert("문제가 발생했습니다. 잠시후 다시 시도해주세요.");
+                }
+            })
+        })
     })
     let provider = new firebase.auth.GoogleAuthProvider();
 
@@ -83,7 +136,7 @@
         return "{\"success\":false, \"result\":\"invalidUser\"}"*/
                                 if (json.result == "noUID") {
                                     alert("신규회원은 닉네임을 정해주셔야 사용가능합니다!");
-                                    openPopup()
+                                    $('#nickNameModal').modal('show');
                                 } else {
                                     alert("문제가 발생했습니다. 잠시후 다시 시도해주세요.");
                                 }
@@ -166,5 +219,12 @@
 <button onclick="twitterLogin()">트위터 로그인</button>
 <button onclick="logout()">로그아웃</button>
 
+<div id="nickNameModal" class="modal">
+    <p>타인에게 보여질 닉네임을 입력해주세요.
+        최대 10자까지 가능하며 한번 정하면
+        다시는 바꿀수 없으니신중히 정해주세요!</p>
+    <label for="nickname">닉네임 : </label><input id="nickname" maxlength="10">
+    <button id="submit">확인</button>
+</div>
 </body>
 </html>
