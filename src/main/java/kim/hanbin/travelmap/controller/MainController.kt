@@ -5,7 +5,10 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestMethod
+import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.multipart.MultipartHttpServletRequest
 import org.springframework.web.server.ResponseStatusException
 import org.springframework.web.servlet.ModelAndView
@@ -26,16 +29,14 @@ class MainController {
 
     @RequestMapping("/index.do")
     fun index(model: Model): String {
-        val list: List<String> = mainService.selectList()
         return "index"
     }
 
     @RequestMapping("/routing.do")
-    fun routing(model: Model, @RequestParam id: Int): String {
+    fun routing(model: Model, @RequestParam id: Long): String {
 
         return mainService.processRouting(model, id)
     }
-
 
     @RequestMapping("/upload_test.do")
     fun uploadTest(model: Model): String {
@@ -59,7 +60,6 @@ class MainController {
     fun loginProcess(request: HttpServletRequest, @RequestParam token: String): String {
         return mainService.processLogin(request, token)
     }
-
 
     @RequestMapping("/login.do")
     fun login(request: HttpServletRequest): String {
@@ -97,7 +97,7 @@ class MainController {
     }
 
     @RequestMapping("/fileDownload.do")
-    fun fileDownload(request: HttpServletRequest, @RequestParam("trackingNum") id: Int): ModelAndView {
+    fun fileDownload(request: HttpServletRequest, @RequestParam("trackingNum") id: Long): ModelAndView {
         val file = mainService.fileDownload(request, id)
         return if (file != null)
             ModelAndView("download", "downloadFile", file)
@@ -107,32 +107,26 @@ class MainController {
 
     @RequestMapping("/deleteFile.do")
     @ResponseBody
-    fun deleteFile(request: HttpServletRequest, @RequestParam("trackingNum") id: Int): String {
+    fun deleteFile(request: HttpServletRequest, @RequestParam("trackingNum") id: Long): String {
         return mainService.deleteFile(request, id)
     }
 
     @RequestMapping("/getUserId.do", method = [RequestMethod.POST])
     @ResponseBody
-    fun getUserId(@RequestParam("userNickname") nickname: String): Int {
+    fun getUserId(@RequestParam("userNickname") nickname: String): Long {
         return mainService.getUserId(nickname)
     }
 
     @RequestMapping("/addFriendRequest.do", method = [RequestMethod.POST])
     @ResponseBody
-    fun addFriendRequest(request: HttpServletRequest, @RequestParam("id") id: Int): String {
-        return mainService.addFriendRequest(request,id)
+    fun addFriendRequest(request: HttpServletRequest, @RequestParam("id") id: Long): String {
+        return mainService.addFriendRequest(request, id)
     }
 
     @RequestMapping("/deleteFriend.do", method = [RequestMethod.POST])
     @ResponseBody
-    fun deleteFriend(request: HttpServletRequest, @RequestParam("id") id: Int): String {
-        return mainService.deleteFriend(request,id)
-    }
-
-    @RequestMapping("/getFriendRequestList.do")
-    @ResponseBody
-    fun getFriendRequestList(request: HttpServletRequest): String {
-        return mainService.getFriendRequestList(request)
+    fun deleteFriend(request: HttpServletRequest, @RequestParam("id") id: Long): String {
+        return mainService.deleteFriend(request, id)
     }
 
     @RequestMapping("/getFriendRequestedList.do")
@@ -145,5 +139,11 @@ class MainController {
     @ResponseBody
     fun getFriendList(request: HttpServletRequest): String {
         return mainService.getFriendList(request)
+    }
+
+    @RequestMapping("/checkFriend.do")
+    @ResponseBody
+    fun checkFriend(request: HttpServletRequest, @RequestParam("id") id: Long): String {
+        return mainService.checkFriend(request, id)
     }
 }

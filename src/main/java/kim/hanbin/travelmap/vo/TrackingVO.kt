@@ -2,17 +2,17 @@ package kim.hanbin.travelmap.vo
 
 
 data class TrackingVO(
-    val id: Int,
-    val userID: Int,
+    val id: Long,
+    val userID: Long,
     val shareNum: UByte,
     val salt: String?,
     val trackingName: String,
-    var filename: String,
+    val filename: String,
     val regTime: String,
-    val isPermited: Boolean = true
+    val isPermitted: Boolean = true
 ) {
     constructor(
-        userID: Int,
+        userID: Long,
         share: UByte,
         salt: String?,
         name: String,
@@ -20,16 +20,28 @@ data class TrackingVO(
     ) : this(0, userID, share, salt, name, filename, "")
 
     constructor(
-        id: Int,
-        userID: Int
+        id: Long,
+        userID: Long
     ) : this(id, userID, 0u, null, "", "", "")
 
     constructor(
-        id: Int,
-        userID: Int,
+        id: Long,
+        userID: Long,
         share: UByte,
         salt: String?,
         name: String,
+        isPermitted: Boolean,
         regTime: String
-    ) : this(id, userID, share, salt, name, "filename", regTime)
+    ) : this(id, userID, share, salt, name, "filename", regTime, isPermitted)
+
+    constructor(
+        id: Long,
+        userID: Long,
+        share: UByte,
+        salt: String?,
+        name: String,
+        isPermitted: Boolean,
+        filename: String,
+        regTime: String
+    ) : this(id, userID, share, salt, name, filename, regTime, isPermitted)
 }

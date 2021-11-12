@@ -1,5 +1,6 @@
 package kim.hanbin.travelmap.dao
 
+import kim.hanbin.travelmap.vo.FriendVO
 import kim.hanbin.travelmap.vo.TrackingVO
 import kim.hanbin.travelmap.vo.UserVO
 import org.springframework.stereotype.Repository
@@ -35,7 +36,11 @@ open class MainDAO : AbstractDAO() {
         return selectOne("main.getMaxTrackingID") as Int
     }
 
-    fun getFile(map: Map<String, Int>): TrackingVO? {
+    fun getUserTrackingList(user: UserVO): List<TrackingVO> {
+        return selectList("main.getUserTrackingList", user) as List<TrackingVO>
+    }
+
+    fun getFile(map: HashMap<String, Long>): TrackingVO? {
         return selectOne("main.getTracking", map) as TrackingVO?
     }
 
@@ -43,35 +48,39 @@ open class MainDAO : AbstractDAO() {
         return delete("main.deleteTracking", file)
     }
 
-    fun getUserId(nickname: String): Int? {
-        return selectOne("main.getUserId", nickname) as Int?
+    fun getUserId(nickname: String): Long? {
+        return selectOne("main.getUserId", nickname) as Long?
     }
 
-    fun checkFriendRequest(map: Map<String, Int>): Int {
+    fun getUserNickname(id: Long): String {
+        return selectOne("main.getUserNickname", id) as String
+    }
+
+    fun checkFriendRequest(map: MutableMap<String, Long>): Int {
         return selectOne("main.checkFriendRequest", map) as Int
     }
 
-    fun addFriendRequest(map: Map<String, Int>) {
+    fun addFriendRequest(map: MutableMap<String, Long>) {
         insert("main.addFriendRequest", map)
     }
 
 
-    fun deleteFriend(map: MutableMap<String, Int>) {
+    fun deleteFriend(map: MutableMap<String, Long>) {
         delete("main.deleteFriend", map)
     }
 
 
-    fun getFriendRequestList(user: UserVO): List<String> {
-        return selectList("main.getFriendRequestList", user) as List<String>
+    fun getFriendRequestedList(user: UserVO): List<FriendVO> {
+        return selectList("main.getFriendRequestedList", user) as List<FriendVO>
     }
 
-    fun getFriendRequestedList(user: UserVO): List<String> {
-        return selectList("main.getFriendRequestedList", user) as List<String>
+    fun getFriendList(user: UserVO): List<FriendVO> {
+        return selectList("main.getFriendList", user) as List<FriendVO>
+
     }
 
-    fun getFriendList(user: UserVO): List<String> {
-        return selectList("main.getFriendList", user) as List<String>
-
+    fun checkFriend(map: MutableMap<String, Long>): Boolean {
+        return selectOne("main.checkFriend", map) as Boolean
     }
 
 }

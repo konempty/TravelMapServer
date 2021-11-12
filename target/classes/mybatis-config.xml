@@ -5,5 +5,6 @@
     <typeAliases>
         <typeAlias type="kim.hanbin.travelmap.vo.UserVO" alias="UserVO"/>
         <typeAlias type="kim.hanbin.travelmap.vo.TrackingVO" alias="TrackingVO"/>
+        <typeAlias type="kim.hanbin.travelmap.vo.FriendVO" alias="FriendVO"/>
     </typeAliases>
 </configuration>

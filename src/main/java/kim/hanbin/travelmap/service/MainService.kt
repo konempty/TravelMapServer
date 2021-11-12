@@ -28,34 +28,34 @@ interface MainService {
     fun processUploadFile(request: MultipartHttpServletRequest): String
 
     @Throws(Exception::class)
-    fun fileDownload(request: HttpServletRequest, id: Int): File?
+    fun fileDownload(request: HttpServletRequest, id: Long): File?
 
     @Throws(Exception::class)
     fun processDeleteUser(request: HttpServletRequest): String
 
     @Throws(Exception::class)
-    fun deleteFile(request: HttpServletRequest, id: Int): String
+    fun deleteFile(request: HttpServletRequest, id: Long): String
 
     @Throws(Exception::class)
-    fun processRouting(model: Model, id: Int): String
+    fun processRouting(model: Model, id: Long): String
 
     @Throws(Exception::class)
-    fun getUserId(nickname: String): Int
+    fun getUserId(nickname: String): Long
 
     @Throws(Exception::class)
-    fun addFriendRequest(request: HttpServletRequest, id: Int): String
+    fun addFriendRequest(request: HttpServletRequest, id: Long): String
 
     @Throws(Exception::class)
-    fun deleteFriend(request: HttpServletRequest, id: Int): String
-
-    @Throws(Exception::class)
-    fun getFriendRequestList(request: HttpServletRequest): String
+    fun deleteFriend(request: HttpServletRequest, id: Long): String
 
     @Throws(Exception::class)
     fun getFriendRequestedList(request: HttpServletRequest): String
 
     @Throws(Exception::class)
     fun getFriendList(request: HttpServletRequest): String
+
+    @Throws(Exception::class)
+     fun checkFriend(request: HttpServletRequest, id: Long): String
 
 
 }

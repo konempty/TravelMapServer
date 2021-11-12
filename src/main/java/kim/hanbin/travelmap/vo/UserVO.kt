@@ -1,7 +1,7 @@
 package kim.hanbin.travelmap.vo
 
 data class UserVO(
-    val id: Int,
+    val id: Long,
     val uid: String,
     val nickname: String,
     val regTime: String

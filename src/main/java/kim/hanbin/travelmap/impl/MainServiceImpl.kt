@@ -1,6 +1,5 @@
 package kim.hanbin.travelmap.impl
 
-import com.google.common.base.Utf8
 import com.google.firebase.auth.FirebaseAuth
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
@@ -16,7 +15,6 @@ import org.springframework.web.multipart.MultipartHttpServletRequest
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
-import java.net.URLDecoder
 import java.nio.charset.Charset
 import java.util.*
 import javax.annotation.Resource
@@ -63,10 +61,10 @@ class MainServiceImpl : MainService {
 
     override fun processLogout(request: HttpServletRequest): String {
         val session = request.session
-        return if(session!=null){
+        return if (session != null) {
             session.invalidate()
             "success"
-        }else{
+        } else {
             "fail"
         }
     }
@@ -100,6 +98,10 @@ class MainServiceImpl : MainService {
         val session = request.session
         val user = session.getAttribute("user") as? UserVO
         if (user != null) {
+            val files = mainDAO.getUserTrackingList(user)
+            for (file in files) {
+                deleteFile(file.filename)
+            }
             mainDAO.deleteUser(user)
             return "{\"success\":true}"
         }
@@ -114,8 +116,8 @@ class MainServiceImpl : MainService {
         val salt = request.getParameter("salt")
         var name = request.getParameter("trackingName")
         val isEncoded = request.getParameter("isEncoded")?.toBooleanStrictOrNull()
-        if(isEncoded ==true) {
-           name= String(Base64.getDecoder().decode(name), Charset.forName("UTF-8"))
+        if (isEncoded == true) {
+            name = String(Base64.getDecoder().decode(name), Charset.forName("UTF-8"))
         }
         val splits = multipartFile.originalFilename!!.split(".")
         val extension = splits[splits.size - 1].uppercase(Locale.KOREA)
@@ -175,10 +177,16 @@ class MainServiceImpl : MainService {
     }
 
     @Throws(Exception::class)
-    override fun deleteFile(request: HttpServletRequest, id: Int): String {
+    override fun deleteFile(request: HttpServletRequest, id: Long): String {
         val session = request.session
         val user = session.getAttribute("user") as? UserVO
         if (user != null) {
+            val hashMap = HashMap<String, Long>()
+            hashMap["id"] = id
+            hashMap["userid"] = user.id
+            val file = mainDAO.getFile(hashMap)
+            if (file != null)
+                deleteFile(file.filename)
             return if (mainDAO.deleteFile(TrackingVO(id, user.id)) == 1)
                 "{\"success\":true}"
             else
@@ -187,36 +195,50 @@ class MainServiceImpl : MainService {
         return "{\"success\":false, \"result\":\"noUID\"}"
     }
 
-    override fun processRouting(model: Model, id: Int): String {
-        val hashMap = HashMap<String, Int>()
+    private fun deleteFile(filename: String) {
+
+
+        val targetFile = File("/TravelMap/uploadFiles/$filename")
+        if (targetFile.exists()) {
+            if (targetFile.delete()) {
+                println("파일삭제 성공")
+            } else {
+                println("파일삭제 실패")
+            }
+        } else {
+            println("파일이 존재하지 않습니다.")
+        }
+    }
+
+    override fun processRouting(model: Model, id: Long): String {
+        val hashMap = HashMap<String, Long>()
         hashMap["id"] = id
         hashMap["userid"] = -1
         val fileVO = mainDAO.getFile(hashMap) ?: return "errorPage"
         if (fileVO.shareNum.toInt() == 2)
             model.addAttribute("salt", "S.salt=${fileVO.salt};")
-if(!fileVO.isPermited)
-    fileVO.filename = ""
+        model.addAttribute("trackingData", "S.shareNum=${fileVO.shareNum};S.userID=${fileVO.userID};S.nickname=${mainDAO.getUserNickname(fileVO.userID)};")
 
         return "routing"
     }
 
-    override fun getUserId(nickname: String): Int {
+    override fun getUserId(nickname: String): Long {
         val result = mainDAO.getUserId(nickname)
-        if(result!=null)
+        if (result != null)
             return result
-       return -1
+        return -1
     }
 
-    override fun addFriendRequest(request: HttpServletRequest, id: Int): String {
+    override fun addFriendRequest(request: HttpServletRequest, id: Long): String {
         val session = request.session
         val user = session.getAttribute("user") as? UserVO
-        if(user!=null){
-            val map = mutableMapOf<String,Int>()
+        if (user != null) {
+            val map = mutableMapOf<String, Long>()
             map["userId"] = user.id
             map["friendId"] = id
-            if(mainDAO.checkFriendRequest(map)!=0){
+            if (user.id==id||mainDAO.checkFriendRequest(map) != 0) {
                 return "alreadyRequested"
-            }else{
+            } else {
                 mainDAO.addFriendRequest(map)
                 return "success"
             }
@@ -224,54 +246,40 @@ if(!fileVO.isPermited)
         return "noUID"
     }
 
-    override fun deleteFriend(request: HttpServletRequest, id: Int): String {
+    override fun deleteFriend(request: HttpServletRequest, id: Long): String {
         val session = request.session
         val user = session.getAttribute("user") as? UserVO
-        if(user!=null){
-            val map = mutableMapOf<String,Int>()
+        if (user != null) {
+            val map = mutableMapOf<String, Long>()
             map["userId"] = user.id
             map["friendId"] = id
-            if(mainDAO.checkFriendRequest(map)==0){
-                return "noRequest"
-            }else{
-                mainDAO.deleteFriend(map)
-                return "success"
-            }
+            mainDAO.deleteFriend(map) //내 신청도 지우고
+            map["userId"] = id
+            map["friendId"] = user.id
+            mainDAO.deleteFriend(map) //상대방 신청도 지운다
+            return "success"
         }
         return "noUID"
     }
 
-    override fun getFriendRequestList(request: HttpServletRequest): String {
-        val session = request.session
-        val user = session.getAttribute("user") as? UserVO
-        if (user != null) {
 
-           val obj =  JsonObject()
-            obj.addProperty("success",true)
-            val list =  mainDAO.getFriendRequestList(user)
-            val arr = JsonArray()
-            for(item in list){
-                arr.add(item)
-            }
-            obj.add("list",arr)
-            return obj.toString()
-        }
-        return "{\"success\":false, \"result\":\"noUID\"}"
-    }
 
     override fun getFriendRequestedList(request: HttpServletRequest): String {
         val session = request.session
         val user = session.getAttribute("user") as? UserVO
         if (user != null) {
 
-            val obj =  JsonObject()
-            obj.addProperty("success",true)
-            val list =  mainDAO.getFriendRequestedList(user)
+            val obj = JsonObject()
+            obj.addProperty("success", true)
+            val list = mainDAO.getFriendRequestedList(user)
             val arr = JsonArray()
-            for(item in list){
-                arr.add(item)
+            for (item in list) {
+                val obj2 = JsonObject()
+                obj2.addProperty("id",item.id)
+                obj2.addProperty("nickname",item.nickname)
+                arr.add(obj2)
             }
-            obj.add("list",arr)
+            obj.add("list", arr)
             return obj.toString()
         }
         return "{\"success\":false, \"result\":\"noUID\"}"
@@ -282,31 +290,49 @@ if(!fileVO.isPermited)
         val user = session.getAttribute("user") as? UserVO
         if (user != null) {
 
-            val obj =  JsonObject()
-            obj.addProperty("success",true)
-            val list =  mainDAO.getFriendList(user)
+            val obj = JsonObject()
+            obj.addProperty("success", true)
+            val list = mainDAO.getFriendList(user)
             val arr = JsonArray()
-            for(item in list){
-                arr.add(item)
+            for (item in list) {
+                val obj2 = JsonObject()
+                obj2.addProperty("id",item.id)
+                obj2.addProperty("nickname",item.nickname)
+                obj2.addProperty("isPartially",item.isPartially)
+                arr.add(obj2)
             }
-            obj.add("list",arr)
+            obj.add("list", arr)
             return obj.toString()
         }
         return "{\"success\":false, \"result\":\"noUID\"}"
     }
 
-    @Throws(Exception::class)
-    override fun fileDownload(request: HttpServletRequest, id: Int): File? {
+    override fun checkFriend(request: HttpServletRequest, id: Long): String {
         val session = request.session
         val user = session.getAttribute("user") as? UserVO
-        val hashMap = HashMap<String, Int>()
+        if (user != null) {
+
+
+            val map = mutableMapOf<String, Long>()
+            map["userId"] = user.id
+            map["friendId"] = id
+            return mainDAO.checkFriend(map).toString()
+        }
+        return "noUID"
+    }
+
+    @Throws(Exception::class)
+    override fun fileDownload(request: HttpServletRequest, id: Long): File? {
+        val session = request.session
+        val user = session.getAttribute("user") as? UserVO
+        val hashMap = HashMap<String, Long>()
         hashMap["id"] = id
         hashMap["userid"] = user?.id ?: 0
 
         val fileVO = mainDAO.getFile(hashMap)
-        if(fileVO?.isPermited==false)
-            fileVO.filename = ""
-        return fileVO?.let { File("/TravelMap/uploadFiles/" + fileVO.filename) }
+        if (fileVO?.isPermitted != true)
+            return null
+        return File("/TravelMap/uploadFiles/" + fileVO.filename)
     }
 
 }

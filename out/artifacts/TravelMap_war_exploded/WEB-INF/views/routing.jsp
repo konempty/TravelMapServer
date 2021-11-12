@@ -209,6 +209,7 @@
 
 
 
+
             ${param.id});
             request.onsuccess = function(event) {
                 console.log(request.result)
@@ -639,7 +640,7 @@
                             isFound[1] = true
                             if (!isDiscrete)
                                 angle = bearing(item2.lat, item2.lng, prevItem.lat, prevItem.lng
-                        )
+                                )
                             if (isFound[2]) {
                                 break;
                             }
@@ -675,73 +676,91 @@
             nextTracking()
 
         }
+
         let speed = 1
-        function resumeAnimation(){
+
+        function resumeAnimation() {
             let destLoc = null
-            for(let i=nextIdx-1;i<data.length;i++) {
+            for (let i = nextIdx - 1; i < data.length; i++) {
                 if (data[i].eventNum == 3) {
                     destLoc = data[i]
                     break;
                 }
             }
             if (destLoc != null) {
-                if(isPause)
+                if (isPause)
                     return
 
-                    let orgDist = lastLoc.sphericalDistance(destLoc)
-                    let currDist = mMap.cameraPosition.target.sphericalDistance(destLoc)
-                    let animateTime
+                let orgDist = lastLoc.sphericalDistance(destLoc)
+                let currDist = mMap.cameraPosition.target.sphericalDistance(destLoc)
+                let animateTime
 
-                    if (isDiscrete) {
-                        isDiscrete = false
-                        animateTime = 1
+                if (isDiscrete) {
+                    isDiscrete = false
+                    animateTime = 1
 
-                    } else {
-                        animateTime = 3000 / speed
-                    }
-                    var ratio = currDist / orgDist
+                } else {
+                    animateTime = 3000 / speed
+                }
+                var ratio = currDist / orgDist
 
-                    if (isAuto && ratio > 0.5) {
+                if (isAuto && ratio > 0.5) {
 
-                        angle = bearing(
-                            lastLoc.latitude,
-                            lastLoc.longitude,
-                            destLoc.latitude,
-                            destLoc.longitude
-                        )
-                        ratio -= 0.5
-                        val time = (1000 / speed * ratio / 0.5).toLong()
-                        mMap.animateCamera(
-                            CameraUpdateFactory.newCameraPosition(
-                                CameraPosition.Builder().target(mMap.cameraPosition.target)
-                                    .bearing(angle)
-                                    .zoom(zoomLevels[zoomlevel]).tilt(90F).build()
-                    ),
-                        time.toInt(),
-                            null
+                    angle = bearing(
+                        lastLoc.latitude,
+                        lastLoc.longitude,
+                        destLoc.latitude,
+                        destLoc.longitude
                     )
-
-                        delay(time - 500 / speed)
-                    } else {
-                        animateTime = (animateTime * currDist / orgDist / 0.5).toInt().coerceAtLeast(1)
-                    }
-                    mMap.animateCamera(CameraUpdateFactory.newCameraPosition(
-                        CameraPosition.Builder().target(destLoc).bearing(angle)
-                            .zoom(zoomLevels[zoomlevel]).tilt(90F).build()
+                    ratio -= 0.5
+                    val
+                    time = (1000 / speed * ratio / 0.5).toLong()
+                    mMap.animateCamera(
+                        CameraUpdateFactory.newCameraPosition(
+                            CameraPosition.Builder().target(mMap.cameraPosition.target)
+                                .bearing(angle)
+                                .zoom(zoomLevels[zoomlevel]).tilt(90
+                    F
+                ).
+                    build()
                 ),
+                    time.toInt(),
+                        null
+                )
 
-                    animateTime,
-                        object :
-                    GoogleMap.CancelableCallback {
-                        override fun onFinish() {
-                            lastLoc = destLoc
-                            nextTracking()
-                        }
+                    delay(time - 500 / speed)
+                } else {
+                    animateTime = (animateTime * currDist / orgDist / 0.5).toInt().coerceAtLeast(1)
+                }
+                mMap.animateCamera(CameraUpdateFactory.newCameraPosition(
+                    CameraPosition.Builder().target(destLoc).bearing(angle)
+                        .zoom(zoomLevels[zoomlevel]).tilt(90
+                F
+            ).
+                build()
+            ),
 
-                        override fun onCancel() {
+                animateTime,
+                    object
+            :
+                GoogleMap.CancelableCallback
+                {
+                    override
+                    fun
+                    onFinish()
+                    {
+                        lastLoc = destLoc
+                        nextTracking()
+                    }
 
-                        }
-                    })
+                    override
+                    fun
+                    onCancel()
+                    {
+
+                    }
+                }
+            )
 
             }
         }
@@ -808,7 +827,7 @@
 <body>
 
 
-<a href="intent://travelmap/#Intent;scheme=scheme;package=kim.hanbin.gpstracker;S.browser_fallback_url=https%3A%2F%2Fnaver.com;S.id=<c:out value="${param.id}" />;${salt}end">a
+<a href="intent://travelmap/#Intent;scheme=scheme;package=kim.hanbin.gpstracker;S.browser_fallback_url=https%3A%2F%2Fnaver.com;${trackingData}S.id=<c:out value="${param.id}" />;${salt}end">a
     tag</a>
 <button onclick="json()"></button>
 <button onclick="btn2()"></button>

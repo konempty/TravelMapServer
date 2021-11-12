@@ -8,20 +8,24 @@
         Select current_date()
         from dual;
     </select>
+
     <select id="getUser" parameterType="String" resultType="UserVO">
         SELECT id, uid, nickname, DATE_FORMAT(regTime, '%Y-%m-%d %T') as reg_time
         from UserTable
         where uid = #{uid};
     </select>
+
     <select id="checkNickname" parameterType="String" resultType="int">
         SELECT count(id)
         from UserTable
         where nickname = #{nickname};
     </select>
+
     <insert id="registerUser" parameterType="UserVO">
         INSERT INTO UserTable(uid, nickname, regTime)
         VALUES (#{uid}, #{nickname}, now());
     </insert>
+
     <delete id="deleteUser" parameterType="UserVO">
         delete
         from UserTable
@@ -33,22 +37,39 @@
         INSERT INTO trackingtable(userID, shareNum, salt, trackingName, filename, regTime)
         VALUES (#{userID}, #{shareNum}, #{salt}, #{trackingName}, #{filename}, now());
     </insert>
+
+    <select id="getUserTrackingList" parameterType="UserVO" resultType="TrackingVO">
+        select id,
+               userID,
+               shareNum,
+               salt,
+               trackingName,
+               1                                      isPermitted,
+               filename,
+               DATE_FORMAT(regTime, '%Y-%m-%d %T') as reg_time
+        from trackingtable
+        where userID = #{id}
+    </select>
+
     <select id="getTracking" parameterType="hashmap" resultType="TrackingVO">
         SELECT id, userID, shareNum, salt, trackingName,(shareNum!=1
         <if test="userid != 0">or userID =
-            #{userid} or #{userid} in (select user2 from friendstable where user1 = userID and user1 in (select user2 from friendstable where user1 = #{userid}))
+            #{userid} or #{userid} in (select user2 from friendstable where user1 = userID and user1 in (select user2
+            from friendstable where user1 = #{userid}))
         </if>
-        ) isPermited,
+        ) isPermitted,
         <if test="userid != -1">filename,</if>
         DATE_FORMAT(regTime, '%Y-%m-%d %T') as reg_time
         from trackingtable
         where id = #{id}
         ;
     </select>
-    <select id="getMaxTrackingID" resultType="int">
+
+    <select id="getMaxTrackingID" resultType="long">
         SELECT max(id)
         from trackingtable;
     </select>
+
     <delete id="deleteTracking" parameterType="TrackingVO">
         delete
         from trackingtable
@@ -56,10 +77,16 @@
           and userID = #{userID};
     </delete>
 
-    <select id="getUserId" parameterType="String" resultType="int">
+    <select id="getUserId" parameterType="String" resultType="long">
         select id
         from usertable
         where nickname = #{nickname};
+    </select>
+
+    <select id="getUserNickname" parameterType="long" resultType="String">
+        select nickname
+        from usertable
+        where id = #{id};
     </select>
 
     <select id="checkFriendRequest" parameterType="Map" resultType="int">
@@ -81,28 +108,25 @@
           and user2 = #{friendId};
     </delete>
 
-    <select id="getFriendRequestList" parameterType="UserVO" resultType="String">
-        SELECT u.nickname
-        from usertable u
-                 join friendstable f1 on u.id = f1.user2
-        where f1.user1 = #{id} #내 친구 리스트중에서 있는 사람
-          and #{id} not in (Select f2.user2 from friendstable f2 where f2.user1 = f1.user2); #그 사람 친구리스트에 내가 없다
-    </select>
-
-    <select id="getFriendRequestedList" parameterType="UserVO" resultType="String">
-        SELECT u.nickname
+    <select id="getFriendRequestedList" parameterType="UserVO" resultType="FriendVO">
+        SELECT u.id id, u.nickname nickname
         from usertable u
                  join friendstable f1 on u.id = f1.user1
         where f1.user2 = #{id} #날 친구로 생각하는 사람
           and f1.user1 not in (Select f2.user2 from friendstable f2 where f2.user1 = #{id}); #내 친구 리스트에 그사람이 없다
     </select>
 
-    <select id="getFriendList" parameterType="UserVO" resultType="String">
-        SELECT u.nickname
+    <select id="getFriendList" parameterType="UserVO" resultType="FriendVO">
+        SELECT u.id id, u.nickname nickname, #{id} not in (Select f2.user2 from friendstable f2 where f2.user1 = f1.user2) isPartially#그 사람 친구 리스트에 내가 있다.
         from usertable u
                  join friendstable f1 on u.id = f1.user2
-        where f1.user1 = #{id} #내 친구 리스트중에서 있는 사람
-          and #{id} in (Select f2.user2 from friendstable f2 where f2.user1 = f1.user2); #그 사람 친구 리스트에 내가 있다.
+        where f1.user1 = #{id}; #내 친구 리스트중에서 있는 사람
+    </select>
+
+    <select id="checkFriend" parameterType="Map" resultType="boolean">
+        SELECT ifnull(sum(#{userId} in (Select f2.user2 from friendstable f2 where f2.user1 = #{friendId})),0)#그 사람 친구 리스트에 내가 있다.
+        from friendstable f1
+        where user1 = #{userId} and user2 = #{friendId};
     </select>
 
 
