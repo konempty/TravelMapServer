@@ -31,9 +31,9 @@ open class MainDAO : AbstractDAO() {
     }
 
     @Transactional
-    open fun insertFile(file: TrackingVO): Int {
+    open fun insertFile(file: TrackingVO): Long {
         insert("main.insertTracking", file)
-        return selectOne("main.getMaxTrackingID") as Int
+        return selectOne("main.getMaxTrackingID") as Long
     }
 
     fun getUserTrackingList(user: UserVO): List<TrackingVO> {
@@ -79,8 +79,8 @@ open class MainDAO : AbstractDAO() {
 
     }
 
-    fun checkFriend(map: MutableMap<String, Long>): Boolean {
-        return selectOne("main.checkFriend", map) as Boolean
+    fun checkPermission(map: MutableMap<String, Long>): Boolean {
+        return selectOne("main.checkPermission", map) as Boolean
     }
 
 }

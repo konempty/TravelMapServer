@@ -55,7 +55,7 @@ interface MainService {
     fun getFriendList(request: HttpServletRequest): String
 
     @Throws(Exception::class)
-     fun checkFriend(request: HttpServletRequest, id: Long): String
+     fun checkPermission(request: HttpServletRequest, id: Long): String
 
 
 }

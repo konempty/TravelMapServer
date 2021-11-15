@@ -217,7 +217,7 @@ class MainServiceImpl : MainService {
         val fileVO = mainDAO.getFile(hashMap) ?: return "errorPage"
         if (fileVO.shareNum.toInt() == 2)
             model.addAttribute("salt", "S.salt=${fileVO.salt};")
-        model.addAttribute("trackingData", "S.shareNum=${fileVO.shareNum};S.userID=${fileVO.userID};S.nickname=${mainDAO.getUserNickname(fileVO.userID)};")
+        model.addAttribute("trackingData", "S.shareNum=${fileVO.shareNum};S.userID=${fileVO.userID};S.nickname=${mainDAO.getUserNickname(fileVO.userID)};S.trackingName=${fileVO.trackingName};")
 
         return "routing"
     }
@@ -307,7 +307,7 @@ class MainServiceImpl : MainService {
         return "{\"success\":false, \"result\":\"noUID\"}"
     }
 
-    override fun checkFriend(request: HttpServletRequest, id: Long): String {
+    override fun checkPermission(request: HttpServletRequest, id: Long): String {
         val session = request.session
         val user = session.getAttribute("user") as? UserVO
         if (user != null) {
@@ -316,7 +316,7 @@ class MainServiceImpl : MainService {
             val map = mutableMapOf<String, Long>()
             map["userId"] = user.id
             map["friendId"] = id
-            return mainDAO.checkFriend(map).toString()
+            return (user.id==id||mainDAO.checkPermission(map)).toString()
         }
         return "noUID"
     }

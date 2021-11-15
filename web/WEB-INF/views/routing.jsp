@@ -52,13 +52,15 @@
     <script>
         let db;
         $(function () {
+
             const IorA = navigator.userAgent.toLowerCase();
 
             if (IorA.indexOf("android") !== -1) {
-                //alert("???");
-                //location.href = "intent://travelmap/#Intent;scheme=scheme;package=kim.hanbin.gpstracker;S.browser_fallback_url=https%3A%2F%2Fnaver.com;end";
+                $('#atag').attr("href", "intent://travelmap/#Intent;scheme=scheme;package=kim.hanbin.gpstracker;S.browser_fallback_url=https%3A%2F%2Fnaver.com;${trackingData}S.id=<c:out value="${param.id}" />;${salt}end")
+
             } else if (IorA.indexOf("iphone") !== -1) {
-                // iphone 일 때
+                $('#atag').attr("href", "travelmap://?S.id=<c:out value="${param.id}" />;${trackingData}${salt}")
+
             } else {
                 //location.href = "https://naver.com";
 
@@ -679,7 +681,7 @@
 
         let speed = 1
 
-        function resumeAnimation() {
+        /*function resumeAnimation() {
             let destLoc = null
             for (let i = nextIdx - 1; i < data.length; i++) {
                 if (data[i].eventNum == 3) {
@@ -719,9 +721,7 @@
                         CameraUpdateFactory.newCameraPosition(
                             CameraPosition.Builder().target(mMap.cameraPosition.target)
                                 .bearing(angle)
-                                .zoom(zoomLevels[zoomlevel]).tilt(90
-                    F
-                ).
+                                .zoom(zoomLevels[zoomlevel]).tilt(90F).
                     build()
                 ),
                     time.toInt(),
@@ -763,7 +763,7 @@
             )
 
             }
-        }
+        }*/
 
     </script>
 </head>
@@ -827,7 +827,7 @@
 <body>
 
 
-<a href="intent://travelmap/#Intent;scheme=scheme;package=kim.hanbin.gpstracker;S.browser_fallback_url=https%3A%2F%2Fnaver.com;${trackingData}S.id=<c:out value="${param.id}" />;${salt}end">a
+<a id = "atag">a
     tag</a>
 <button onclick="json()"></button>
 <button onclick="btn2()"></button>

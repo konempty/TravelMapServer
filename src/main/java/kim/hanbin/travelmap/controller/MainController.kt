@@ -141,9 +141,9 @@ class MainController {
         return mainService.getFriendList(request)
     }
 
-    @RequestMapping("/checkFriend.do")
+    @RequestMapping("/checkPermission.do")
     @ResponseBody
     fun checkFriend(request: HttpServletRequest, @RequestParam("id") id: Long): String {
-        return mainService.checkFriend(request, id)
+        return mainService.checkPermission(request, id)
     }
 }
