@@ -32,10 +32,10 @@ class MainController {
         return "index"
     }
 
-    @RequestMapping("/routing.do")
-    fun routing(model: Model, @RequestParam id: Long): String {
+    @RequestMapping("/browse.do")
+    fun routing(request: HttpServletRequest, model: Model, @RequestParam id: Long): String {
 
-        return mainService.processRouting(model, id)
+        return mainService.processRouting(request,model, id)
     }
 
     @RequestMapping("/upload_test.do")

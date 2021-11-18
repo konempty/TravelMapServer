@@ -185,10 +185,11 @@ class MainServiceImpl : MainService {
             hashMap["id"] = id
             hashMap["userid"] = user.id
             val file = mainDAO.getFile(hashMap)
-            if (file != null)
-                deleteFile(file.filename)
-            return if (mainDAO.deleteFile(TrackingVO(id, user.id)) == 1)
+            return if (mainDAO.deleteFile(TrackingVO(id, user.id)) == 1){
+                if (file != null)
+                    deleteFile(file.filename)
                 "{\"success\":true}"
+            }
             else
                 "{\"success\":false, \"result\":\"noDelete\"}"
         }
@@ -210,16 +211,26 @@ class MainServiceImpl : MainService {
         }
     }
 
-    override fun processRouting(model: Model, id: Long): String {
+    override fun processRouting(request: HttpServletRequest,model: Model, id: Long): String {
         val hashMap = HashMap<String, Long>()
+        val session = request.session
+        val user = session.getAttribute("user") as? UserVO
         hashMap["id"] = id
-        hashMap["userid"] = -1
+        hashMap["userid"] = user?.id ?: -1
         val fileVO = mainDAO.getFile(hashMap) ?: return "errorPage"
         if (fileVO.shareNum.toInt() == 2)
             model.addAttribute("salt", "S.salt=${fileVO.salt};")
-        model.addAttribute("trackingData", "S.shareNum=${fileVO.shareNum};S.userID=${fileVO.userID};S.nickname=${mainDAO.getUserNickname(fileVO.userID)};S.trackingName=${fileVO.trackingName};")
+        val nickname = mainDAO.getUserNickname(fileVO.userID)
+        model.addAttribute(
+            "trackingData",
+            "S.shareNum=${fileVO.shareNum};S.userID=${fileVO.userID};S.nickname=${nickname};S.trackingName=${fileVO.trackingName};"
+        )
+        model.addAttribute("shareNum",fileVO.shareNum.toLong())
+        model.addAttribute("isPermitted",fileVO.isPermitted)
+        model.addAttribute("userID",fileVO.userID)
+        model.addAttribute("nickname",nickname)
 
-        return "routing"
+        return "browse"
     }
 
     override fun getUserId(nickname: String): Long {
@@ -236,7 +247,7 @@ class MainServiceImpl : MainService {
             val map = mutableMapOf<String, Long>()
             map["userId"] = user.id
             map["friendId"] = id
-            if (user.id==id||mainDAO.checkFriendRequest(map) != 0) {
+            if (user.id == id || mainDAO.checkFriendRequest(map) != 0) {
                 return "alreadyRequested"
             } else {
                 mainDAO.addFriendRequest(map)
@@ -263,7 +274,6 @@ class MainServiceImpl : MainService {
     }
 
 
-
     override fun getFriendRequestedList(request: HttpServletRequest): String {
         val session = request.session
         val user = session.getAttribute("user") as? UserVO
@@ -275,8 +285,8 @@ class MainServiceImpl : MainService {
             val arr = JsonArray()
             for (item in list) {
                 val obj2 = JsonObject()
-                obj2.addProperty("id",item.id)
-                obj2.addProperty("nickname",item.nickname)
+                obj2.addProperty("id", item.id)
+                obj2.addProperty("nickname", item.nickname)
                 arr.add(obj2)
             }
             obj.add("list", arr)
@@ -296,9 +306,9 @@ class MainServiceImpl : MainService {
             val arr = JsonArray()
             for (item in list) {
                 val obj2 = JsonObject()
-                obj2.addProperty("id",item.id)
-                obj2.addProperty("nickname",item.nickname)
-                obj2.addProperty("isPartially",item.isPartially)
+                obj2.addProperty("id", item.id)
+                obj2.addProperty("nickname", item.nickname)
+                obj2.addProperty("isPartially", item.isPartially)
                 arr.add(obj2)
             }
             obj.add("list", arr)
@@ -316,7 +326,7 @@ class MainServiceImpl : MainService {
             val map = mutableMapOf<String, Long>()
             map["userId"] = user.id
             map["friendId"] = id
-            return (user.id==id||mainDAO.checkPermission(map)).toString()
+            return (user.id == id || mainDAO.checkPermission(map)).toString()
         }
         return "noUID"
     }

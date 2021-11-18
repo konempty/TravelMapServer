@@ -117,16 +117,19 @@
     </select>
 
     <select id="getFriendList" parameterType="UserVO" resultType="FriendVO">
-        SELECT u.id id, u.nickname nickname, #{id} not in (Select f2.user2 from friendstable f2 where f2.user1 = f1.user2) isPartially#그 사람 친구 리스트에 내가 있다.
+        SELECT u.id                                                                          id,
+               u.nickname                                                                    nickname,
+               #{id} not in (Select f2.user2 from friendstable f2 where f2.user1 = f1.user2) isPartially#그 사람 친구 리스트에 내가 있다.
         from usertable u
                  join friendstable f1 on u.id = f1.user2
         where f1.user1 = #{id}; #내 친구 리스트중에서 있는 사람
     </select>
 
     <select id="checkPermission" parameterType="Map" resultType="boolean">
-        SELECT ifnull(sum(#{userId} in (Select f2.user2 from friendstable f2 where f2.user1 = #{friendId})),0)#그 사람 친구 리스트에 내가 있다.
+        SELECT ifnull(sum(#{userId} in (Select f2.user2 from friendstable f2 where f2.user1 = #{friendId})), 0)#그 사람 친구 리스트에 내가 있다.
         from friendstable f1
-        where user1 = #{userId} and user2 = #{friendId};
+        where user1 = #{userId}
+          and user2 = #{friendId};
     </select>
 
 

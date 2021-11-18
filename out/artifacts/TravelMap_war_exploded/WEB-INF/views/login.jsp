@@ -26,6 +26,7 @@
 <body>
 
 <script>
+    let provider = null;
     $(function () {
         $('#nickNameModal').modal('show');
         const firebaseConfig = {
@@ -40,6 +41,7 @@
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         firebase.auth().useDeviceLanguage();
+        provider = new firebase.auth.GoogleAuthProvider();
 
         $('#nickname').keyup(function () {
             if ($(this).val().length > $(this).attr('maxlength')) {
@@ -90,7 +92,6 @@
             })
         })
     })
-    let provider = new firebase.auth.GoogleAuthProvider();
 
     function googleLogin() {
         provider = new firebase.auth.GoogleAuthProvider();

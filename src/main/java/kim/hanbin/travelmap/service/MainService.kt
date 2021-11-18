@@ -37,7 +37,7 @@ interface MainService {
     fun deleteFile(request: HttpServletRequest, id: Long): String
 
     @Throws(Exception::class)
-    fun processRouting(model: Model, id: Long): String
+    fun processRouting(request: HttpServletRequest, model: Model, id: Long): String
 
     @Throws(Exception::class)
     fun getUserId(nickname: String): Long
@@ -55,7 +55,7 @@ interface MainService {
     fun getFriendList(request: HttpServletRequest): String
 
     @Throws(Exception::class)
-     fun checkPermission(request: HttpServletRequest, id: Long): String
+    fun checkPermission(request: HttpServletRequest, id: Long): String
 
 
 }
