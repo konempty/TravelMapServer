@@ -1,6 +1,6 @@
 # TravelMapServer
 
-[**데모 보러가기**](https://konempty.github.io/2016270205%20%EA%B9%80%ED%95%9C%EB%B9%88%20%EC%BA%A1%EC%8A%A4%ED%86%A4%20%EB%94%94%EC%9E%90%EC%9D%B8%20%EC%8B%9C%EC%97%B0%EC%98%81%EC%83%81.mp4)
+[**데모 보러가기**](https://github.com/konempty/konempty.github.io/raw/main/2016270205%20%EA%B9%80%ED%95%9C%EB%B9%88%20%EC%BA%A1%EC%8A%A4%ED%86%A4%20%EB%94%94%EC%9E%90%EC%9D%B8%20%EC%8B%9C%EC%97%B0%EC%98%81%EC%83%81.mp4)
 
 ## 기획의도
 1. 사진을 찍는 것 만으로는 그 여행에 대한 기록을 남기기 힘들고 사진을 촬영한 장소를 모두 기억하는 것은 상당히 어려울 것이다.\
